@@ -1,0 +1,62 @@
+body {
+    color: white;
+    background-color: black;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  
+  section {
+    padding: 20px;
+  }
+  
+  h1, h2 {
+    color: #333;
+  }
+  
+  nav a {
+    margin-right: 15px;
+    text-decoration: none;
+    color: blue;
+  }
+  .firstdiv {
+    color: green;
+    background-color: red;
+    width:500px;
+    height: 500px;
+    border: 9px solid aqua;
+    padding: 10px;
+    margin: 100px;
+    display: inline block;
+  }
+  table {
+    width:100%;
+    border-collapse: collapse;
+    text-align: center;
+  }
+  td, th{
+    border: 1px solid white;
+    padding: 10px;
+  }
+  .anotherdiv {
+    background-color: blue;
+    display: inline-block;
+    width:500px;
+  
+    height: 500px;
+    border: 9px solid aqua;
+    padding: 1px;
+    
+  }
+  .lorem{
+    text-align: center;
+    text-decoration:none;
+    font-weight: 399;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  .para{
+    font-size: 58px;
+  }
+  .h {
+    font-size: 2rem;
+  }

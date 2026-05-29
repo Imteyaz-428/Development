@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registration Form</title>
+    <style>
+        body { font-family: Arial; margin: 40px; }
+        label { display: block; margin-top: 10px; }
+        .error { color: red; }
+    </style>
+</head>
+
+<body>
+    <h2>Registration Form</h2>
+
+    <form onsubmit="return validateForm()">
+
+        <label>Name:</label>
+        <input type="text" id="name">
+
+        <label>Password:</label>
+        <input type="password" id="password">
+
+        <label>Email:</label>
+        <input type="text" id="email">
+
+        <label>Phone Number:</label>
+        <input type="text" id="phone">
+
+        <label>Sex:</label>
+        <input type="radio" name="sex" value="Male"> Male
+        <input type="radio" name="sex" value="Female"> Female
+
+        <label>Date of Birth:</label>
+        <select id="day">
+            <option value="">Day</option>
+            <script>
+                for (let i=1; i<=31; i++) {
+                    document.write(`<option>${i}</option>`);
+                }
+            </script>
+        </select>
+
+        <select id="month">
+            <option value="">Month</option>
+            <option>Jan</option><option>Feb</option><option>Mar</option>
+            <option>Apr</option><option>May</option><option>Jun</option>
+            <option>Jul</option><option>Aug</option><option>Sep</option>
+            <option>Oct</option><option>Nov</option><option>Dec</option>
+        </select>
+
+        <select id="year">
+            <option value="">Year</option>
+            <script>
+                for (let y = 1980; y <= 2023; y++) {
+                    document.write(`<option>${y}</option>`);
+                }
+            </script>
+        </select>
+
+        <label>Languages Known:</label>
+        <input type="checkbox" name="lang" value="English"> English
+        <input type="checkbox" name="lang" value="Telugu"> Telugu
+        <input type="checkbox" name="lang" value="Hindi"> Hindi
+        <input type="checkbox" name="lang" value="Tamil"> Tamil
+
+        <label>Address:</label>
+        <textarea id="address"></textarea>
+
+        <br><br>
+        <button type="submit">Submit</button>
+
+    </form>
+
+    <p class="error" id="error"></p>
+
+<script>
+function validateForm() {
+    let name = document.getElementById("name").value.trim();
+    let password = document.getElementById("password").value.trim();
+    let email = document.getElementById("email").value.trim();
+    let phone = document.getElementById("phone").value.trim();
+
+    // --- NAME Validation ---
+    if (!/^[A-Za-z ]+$/.test(name) || name.length < 6) {
+        showError("Name must contain only alphabets and be at least 6 characters.");
+        return false;
+    }
+
+    // --- PASSWORD Validation ---
+    if (password.length < 6) {
+        showError("Password must be at least 6 characters.");
+        return false;
+    }
+
+    // --- EMAIL Validation ---
+    let emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailPattern.test(email)) {
+        showError("Enter a valid email (example: name@domain.com).");
+        return false;
+    }
+
+    // --- PHONE Validation ---
+    if (!/^\d{10}$/.test(phone)) {
+        showError("Phone number must contain exactly 10 digits.");
+        return false;
+    }
+
+    // --- SEX Validation ---
+    let sex = document.querySelector('input[name="sex"]:checked');
+    if (!sex) {
+        showError("Please select your gender.");
+        return false;
+    }
+
+    // --- DOB Validation ---
+    if (document.getElementById("day").value === "" ||
+        document.getElementById("month").value === "" ||
+        document.getElementById("year").value === "") {
+
+        showError("Please select complete Date of Birth.");
+        return false;
+    }
+
+    // --- LANGUAGE Validation ---
+    let lang = document.querySelectorAll('input[name="lang"]:checked');
+    if (lang.length === 0) {
+        showError("Please select at least one language.");
+        return false;
+    }
+
+    // --- ADDRESS Validation ---
+    if (document.getElementById("address").value.trim() === "") {
+        showError("Address cannot be empty.");
+        return false;
+    }
+
+    alert("Registration Successful!");
+    return true;
+}
+
+function showError(msg) {
+    document.getElementById("error").innerText = msg;
+}
+</script>
+
+</body>
+</html>

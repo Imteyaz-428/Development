@@ -1,0 +1,41 @@
+.Hello{
+    text-align: center;
+}
+.tr{
+    color: aqua;
+
+}
+.Logo{
+    
+    border: 1px solid black;
+}
+.website{
+    border: 1px solid black;
+    width:150px;
+}
+.Home{
+    border:1px solid black;
+    padding: 8px;
+}
+
+table {
+    border-collapse: collapse;
+    border: 2px solid black;
+    
+}
+.select {
+    
+    display: inline;
+}
+form {
+    content: ".";
+}
+.submit{
+    background-color: aqua;
+}
+.cse{
+    height: 40px;
+}
+.he{
+    border: 1px solid black;
+}

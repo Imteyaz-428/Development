@@ -1,0 +1,12 @@
+let newDate = new Date();
+console.log(newDate.toString());
+let time = Date.now();
+console.log(time);
+let date = new Date(2026,11,30);
+let date2 = new Date(2026,4,21);
+console.log(date.toLocaleTimeString());
+let day  = (date2 - date)/(1000 * 60 * 60 * 24);
+console.log(day.toFixed(2));
+let diff = date - date2;
+let result = new Date(diff);
+console.log(result);

@@ -1,0 +1,107 @@
+/* h1 {
+    color : green;
+}
+p {
+    color :red;
+
+}
+/* button {
+    color :green;
+} */
+/* body {
+    background-color: white;
+}
+.headings {
+    color : red;
+}
+div{
+    color: blue;
+}
+.heading {
+    color : brown;
+}
+h1 {
+    text-align : centre;
+}
+h1 {
+    text-transform : capitalize;
+    color : red;
+    font-family : 'Times New Roman';
+}
+#outer {
+    font-size : 25px;
+
+}
+#inner {
+    font-size : 10px;
+} */ 
+/* 
+h1 {
+    text-align : center;
+    background-color: blue;
+    height: 30px;
+    width: 200px;
+    border-width: 200px;
+    border-style: dashed;
+    border-color:aqua;
+
+}
+ {
+    height: 100px;
+    text-align: center;
+    width: 100px;
+    background-color: green;
+    border-radius: 50%;
+} */
+/* practice set:4; */
+/* #amazon {
+    background-color: #157066;
+    
+    height: 60px;
+}
+#id1 {
+    color : brown;
+    font-size: 25px;
+}
+a {
+    margin-right: 200px;
+}
+.contentbox{
+    height : 100px;
+    width: 100px;
+    border : 2px solid black;
+    display: inline-block;
+    /* justify-content: 50%; */
+   
+/* }
+#content {
+    height: 50px;
+    text-align: center;
+    margin-top: 200px;
+   
+}
+footer {
+    text-align: center;
+    background-color: aqua;
+}
+#box1 {
+    height : 300px;
+    width : 300px;
+
+   
+    background-size: cover;
+}
+body {
+    background-image: url("flower.jpg");
+    background-repeat: no-repeat;
+} */ 
+
+div {
+    height: 100px;
+    width: 100px;
+    background-image: url("flower.jpg");
+    background-size: cover;
+    color: white;
+    position: fixed;
+    right:0px;
+}
