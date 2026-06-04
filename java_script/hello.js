@@ -10,5 +10,4 @@ console.log(a);
 let name = "imteyaz";
 let roll_no = 2400971640030;
 console.table([name, roll_no]);
-let date = now();
-console.log(date);
+
