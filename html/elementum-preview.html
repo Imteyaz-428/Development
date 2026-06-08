@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elementum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:#fff;color:#111;scroll-behavior:smooth;}
+a{text-decoration:none;color:inherit;}
+img{max-width:100%;display:block;}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:18px 48px;display:flex;align-items:center;justify-content:space-between;
+  transition:all 0.4s ease;
+}
+nav.scrolled{
+  background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(0,0,0,0.06);
+}
+.nav-logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;letter-spacing:-0.5px;}
+.nav-links{display:flex;gap:36px;align-items:center;}
+.nav-links a{font-size:14px;color:#333;font-weight:400;transition:color 0.2s;}
+.nav-links a:hover{color:#E84545;}
+.nav-cta{background:#111;color:#fff;border:none;padding:10px 24px;border-radius:4px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;letter-spacing:0.3px;transition:background 0.2s;}
+.nav-cta:hover{background:#E84545;}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;background:#fff;position:relative;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:120px 48px 80px;overflow:hidden;
+}
+.hero-inner{max-width:1100px;margin:0 auto;width:100%;}
+.hero h1{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(38px,6vw,72px);font-weight:700;line-height:1.1;
+  color:#111;max-width:680px;position:relative;z-index:2;
+  animation:fadeUp 0.9s ease both;
+}
+.hero h1 .underline-red{position:relative;display:inline;}
+.hero h1 .underline-red::after{
+  content:'';position:absolute;bottom:-4px;left:0;width:100%;height:3px;
+  background:#E84545;border-radius:2px;
+  animation:growLine 1s 0.7s ease both;transform-origin:left;
+}
+@keyframes growLine{from{transform:scaleX(0);}to{transform:scaleX(1);}}
+.hero-sub{
+  font-size:15px;color:#666;max-width:380px;line-height:1.7;
+  margin-top:24px;margin-bottom:48px;
+  animation:fadeUp 0.9s 0.15s ease both;
+}
+.hero-photos{
+  position:relative;height:280px;width:100%;
+  animation:fadeIn 1s 0.3s ease both;
+}
+.photo-circle{
+  position:absolute;border-radius:50%;overflow:hidden;
+  border:3px solid #fff;box-shadow:0 8px 24px rgba(0,0,0,0.12);
+  transition:transform 0.3s ease;cursor:pointer;
+}
+.photo-circle:hover{transform:scale(1.08)!important;}
+.photo-circle img{width:100%;height:100%;object-fit:cover;}
+
+/* Decorative */
+.deco-rect{position:absolute;border-radius:4px;pointer-events:none;}
+.deco-circle{position:absolute;border-radius:50%;pointer-events:none;}
+.deco-line{position:absolute;pointer-events:none;}
+.deco-blob{position:absolute;pointer-events:none;}
+
+/* ── SECTIONS ── */
+section{padding:100px 48px;}
+.section-inner{max-width:1100px;margin:0 auto;}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
+.two-col-flip{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
+
+.section-img{
+  position:relative;border-radius:16px;overflow:hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,0.1);
+  height:380px;width:100%;object-fit:cover;
+  transition:transform 0.4s ease;
+}
+.img-wrap{position:relative;}
+.img-wrap:hover .section-img{transform:scale(1.02);}
+.img-blob{position:absolute;border-radius:50%;z-index:0;}
+
+h2.section-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(26px,4vw,44px);font-weight:700;color:#111;line-height:1.2;
+  margin-bottom:20px;
+}
+p.section-text{font-size:14px;color:#666;line-height:1.8;margin-bottom:16px;}
+.read-more{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:13px;font-weight:600;color:#111;
+  border-bottom:1.5px solid #111;padding-bottom:2px;
+  transition:color 0.2s,border-color 0.2s;margin-top:8px;
+}
+.read-more:hover{color:#E84545;border-color:#E84545;}
+
+/* ── SERVICES ── */
+.services-bg{background:#fff;}
+.offer-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(32px,5vw,58px);font-weight:700;color:#111;
+  line-height:1.15;margin-bottom:64px;
+}
+.offer-title em{font-style:italic;color:#E84545;}
+
+.service-row{
+  display:grid;grid-template-columns:220px 1fr auto;
+  align-items:center;gap:40px;
+  padding:28px 16px;border-bottom:1px solid rgba(0,0,0,0.1);
+  cursor:pointer;border-radius:8px;
+  transition:background 0.2s;margin:0 -16px;
+}
+.service-row:hover{background:rgba(232,69,69,0.03);}
+.service-row:hover .service-title{color:#E84545;}
+.service-row:hover .arrow-circle{border-color:#E84545;background:#E84545;}
+.service-row:hover .arrow-circle svg path{stroke:#fff;}
+.service-cat{font-size:11px;color:#999;line-height:1.5;}
+.service-title{font-family:'Playfair Display',serif;font-size:clamp(17px,2.5vw,27px);font-weight:600;color:#111;transition:color 0.2s;}
+.arrow-circle{
+  width:36px;height:36px;border-radius:50%;
+  border:1.5px solid #ccc;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:border-color 0.2s,background 0.2s;
+}
+
+/* ── TESTIMONIALS ── */
+.testimonials-bg{background:#fafafa;}
+.testi-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(26px,4vw,46px);font-weight:700;
+  color:#111;text-align:center;margin-bottom:16px;
+}
+.testi-title .ul-red{text-decoration:underline;text-decoration-color:#E84545;}
+.testi-grid{display:grid;grid-template-columns:80px 1fr 80px;gap:32px;align-items:center;margin-top:60px;}
+.side-photos{display:flex;flex-direction:column;gap:12px;align-items:center;}
+.side-photo{border-radius:50%;object-fit:cover;border:3px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,0.1);}
+.testi-card{
+  background:#fff;border-radius:16px;padding:36px 40px;
+  box-shadow:0 8px 40px rgba(0,0,0,0.07);position:relative;
+}
+.quote-mark{font-size:72px;color:#E84545;line-height:0.7;font-family:serif;opacity:0.25;}
+.testi-text{font-size:14px;color:#555;line-height:1.8;text-align:center;margin:16px 0;}
+
+/* ── NEWSLETTER ── */
+.newsletter-bg{background:#C8F0D8;position:relative;overflow:hidden;}
+.newsletter-inner{max-width:560px;margin:0 auto;text-align:center;position:relative;z-index:1;padding:80px 48px;}
+.newsletter-inner h2{font-family:'Playfair Display',serif;font-size:clamp(28px,4vw,46px);font-weight:700;color:#111;margin-bottom:12px;}
+.newsletter-inner p{font-size:13px;color:#444;margin-bottom:32px;}
+.subscribe-form{display:flex;max-width:400px;margin:0 auto;border-radius:4px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.1);}
+.subscribe-form input{flex:1;padding:14px 18px;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:13px;color:#333;}
+.subscribe-form input::placeholder{color:#aaa;}
+.subscribe-form button{background:#111;color:#fff;border:none;padding:14px 22px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background 0.2s;}
+.subscribe-form button:hover{background:#E84545;}
+.nl-shape{position:absolute;right:80px;top:50%;transform:translateY(-50%);width:80px;height:110px;background:#7B61FF;border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;opacity:0.7;}
+
+/* ── FOOTER ── */
+footer{background:#fff;border-top:1px solid rgba(0,0,0,0.08);padding:60px 48px 40px;}
+.footer-inner{max-width:1100px;margin:0 auto;}
+.footer-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:48px;margin-bottom:48px;}
+.footer-col-title{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#999;margin-bottom:20px;}
+.footer-col a{display:block;font-size:13px;color:#444;margin-bottom:10px;transition:color 0.2s;}
+.footer-col a:hover{color:#E84545;}
+.footer-col p{font-size:12px;color:#666;margin-bottom:8px;line-height:1.5;}
+.footer-bottom{border-top:1px solid rgba(0,0,0,0.08);padding-top:24px;display:flex;justify-content:space-between;align-items:center;}
+.footer-copy{font-size:12px;color:#aaa;}
+.footer-logo{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:#111;}
+
+/* ── SCROLL REVEAL ── */
+.reveal{opacity:0;transform:translateY(32px);transition:opacity 0.75s ease,transform 0.75s ease;}
+.reveal.in{opacity:1;transform:translateY(0);}
+.reveal-left{opacity:0;transform:translateX(-32px);transition:opacity 0.75s ease,transform 0.75s ease;}
+.reveal-left.in{opacity:1;transform:translateX(0);}
+.reveal-right{opacity:0;transform:translateX(32px);transition:opacity 0.75s ease,transform 0.75s ease;}
+.reveal-right.in{opacity:1;transform:translateX(0);}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  nav{padding:16px 24px;}
+  .nav-links{display:none;}
+  .hero{padding:100px 24px 60px;}
+  section{padding:70px 24px;}
+  .two-col,.two-col-flip{grid-template-columns:1fr;gap:40px;}
+  .two-col-flip .img-wrap{order:-1;}
+  .service-row{grid-template-columns:1fr auto;gap:16px;}
+  .service-cat{display:none;}
+  .testi-grid{grid-template-columns:1fr;gap:24px;}
+  .side-photos{flex-direction:row;justify-content:center;}
+  .footer-grid{grid-template-columns:repeat(2,1fr);gap:32px;}
+  .newsletter-inner{padding:60px 24px;}
+  .hero-photos{height:200px;}
+  footer{padding:40px 24px 32px;}
+}
+@media(max-width:560px){
+  .hero h1{font-size:34px;}
+  .offer-title{font-size:30px;}
+  .footer-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <div class="nav-logo">Elementum</div>
+  <div class="nav-links">
+    <a href="#">Home</a>
+    <a href="#">Studio</a>
+    <a href="#">Service</a>
+    <a href="#">Blog</a>
+  </div>
+  <button class="nav-cta">Contact Us</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <!-- Decorative elements -->
+  <div class="deco-rect" style="top:160px;right:40px;width:28px;height:36px;background:#E84545;transform:rotate(12deg);animation:fadeIn 1s 0.5s ease both;"></div>
+  <div class="deco-rect" style="top:200px;right:76px;width:20px;height:28px;background:#7B61FF;transform:rotate(-8deg);animation:fadeIn 1s 0.6s ease both;"></div>
+  <div style="position:absolute;top:80px;right:-40px;width:160px;height:200px;border:2px solid rgba(232,69,69,0.2);border-radius:60% 40% 55% 45%;transform:rotate(15deg);pointer-events:none;animation:fadeIn 1.2s 0.4s ease both;"></div>
+  <div style="position:absolute;left:28px;top:52%;width:3px;height:110px;background:#ddd;border-radius:2px;transform:rotate(-8deg);pointer-events:none;"></div>
+
+  <div class="hero-inner">
+    <h1>The thinkers and doers were <span class="underline-red">changing the status Quo</span> with</h1>
+    <p class="hero-sub">We are a team of strategists, designers, communicators, researchers. Together, we believe that progress only happens when you refuse to play things safe.</p>
+
+    <div class="hero-photos">
+      <div class="photo-circle" style="width:90px;height:90px;top:0;left:70px;">
+        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&crop=face" alt="">
+      </div>
+      <div class="photo-circle" style="width:115px;height:115px;top:25px;left:210px;">
+        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop&crop=face" alt="">
+      </div>
+      <div class="photo-circle" style="width:100px;height:100px;top:75px;left:360px;">
+        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop&crop=face" alt="">
+      </div>
+      <div class="photo-circle" style="width:125px;height:125px;top:5px;left:500px;">
+        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&h=120&fit=crop&crop=face" alt="">
+      </div>
+      <div class="photo-circle" style="width:95px;height:95px;top:95px;left:650px;">
+        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=face" alt="">
+      </div>
+      <div class="photo-circle" style="width:85px;height:85px;top:155px;left:430px;">
+        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=face" alt="">
+      </div>
+      <!-- small decoratives -->
+      <div style="position:absolute;top:60px;left:165px;width:14px;height:14px;background:#E84545;border-radius:2px;transform:rotate(15deg);"></div>
+      <div style="position:absolute;top:115px;left:310px;width:11px;height:11px;background:#111;border-radius:50%;"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section style="background:#fff;padding:100px 48px;">
+  <div class="section-inner two-col">
+    <div class="reveal-left">
+      <h2 class="section-title">Tomorrow should be better than today</h2>
+      <p class="section-text">We are a team of strategists, designers, communicators, researchers. Together, we believe that progress only happens when you refuse to play things safe.</p>
+      <a href="#" class="read-more">Read more ——</a>
+    </div>
+    <div class="img-wrap reveal-right" style="delay:0.2s">
+      <div class="img-blob" style="top:-20px;right:-20px;width:55%;height:55%;background:rgba(232,69,69,0.07);"></div>
+      <div style="position:absolute;bottom:24px;left:-12px;width:0;height:0;border-left:22px solid transparent;border-right:22px solid transparent;border-bottom:38px solid #E84545;z-index:2;"></div>
+      <img class="section-img" src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=700&h=500&fit=crop" alt="Team collaboration">
+    </div>
+  </div>
+</section>
+
+<!-- PROGRESS -->
+<section style="background:#fafafa;padding:100px 48px;">
+  <div class="section-inner two-col-flip">
+    <div class="img-wrap reveal-left">
+      <div class="img-blob" style="top:-15px;left:-15px;width:50%;height:50%;background:rgba(123,97,255,0.07);"></div>
+      <img class="section-img" src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=700&h=500&fit=crop" alt="Progress">
+    </div>
+    <div class="reveal-right" style="transition-delay:0.15s">
+      <h2 class="section-title">See how we can help you progress</h2>
+      <p class="section-text">We add a layer of fearless insights and action that allows change makers to accelerate their progress in areas such as brand, design, digital, comms and social research.</p>
+      <a href="#" class="read-more">Read more ——</a>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="services-bg" style="padding:100px 48px;">
+  <div class="section-inner">
+    <h2 class="offer-title reveal">What we can<br><em>offer</em> you!</h2>
+    <div>
+      <div class="service-row reveal" style="transition-delay:0.1s">
+        <div class="service-cat">Office of multiple<br>interest content</div>
+        <div class="service-title">Collaborative &amp; partnership</div>
+        <div class="arrow-circle">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="#999" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <div class="service-row reveal" style="transition-delay:0.2s">
+        <div class="service-cat">The hanger US Air force<br>digital experimental</div>
+        <div class="service-title">We talk about our weight</div>
+        <div class="arrow-circle">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="#999" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <div class="service-row reveal" style="transition-delay:0.3s">
+        <div class="service-cat">Delta faucet content,<br>social, digital</div>
+        <div class="service-title">Piloting digital confidence</div>
+        <div class="arrow-circle">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="#999" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials-bg" style="padding:100px 48px;">
+  <div class="section-inner">
+    <h2 class="testi-title reveal">What our customer says <span class="ul-red">About Us</span></h2>
+    <div class="testi-grid reveal" style="transition-delay:0.2s">
+      <div class="side-photos">
+        <img class="side-photo" style="width:58px;height:58px;" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face" alt="">
+        <img class="side-photo" style="width:48px;height:48px;margin-left:14px;" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=face" alt="">
+        <img class="side-photo" style="width:54px;height:54px;" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face" alt="">
+      </div>
+      <div class="testi-card">
+        <div class="quote-mark">"</div>
+        <p class="testi-text">Elementum delivered the site within the timeline as they requested. In the end, the client found a 50% increase in traffic within days since its launch. They also had an impressive ability to use technologies that the company hasn't used, which have also proved to be easy to use and reliable.</p>
+        <div style="display:flex;justify-content:flex-end;"><div class="quote-mark">"</div></div>
+      </div>
+      <div class="side-photos">
+        <img class="side-photo" style="width:54px;height:54px;" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face" alt="">
+        <img class="side-photo" style="width:64px;height:64px;margin-left:-12px;" src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face" alt="">
+        <img class="side-photo" style="width:46px;height:46px;" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&h=80&fit=crop&crop=face" alt="">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section class="newsletter-bg">
+  <div class="nl-shape"></div>
+  <div style="position:absolute;right:145px;bottom:24px;width:38px;height:38px;border:2px solid rgba(0,0,0,0.15);border-radius:50%;"></div>
+  <div class="newsletter-inner reveal">
+    <h2>Subscribe to<br>our newsletter</h2>
+    <p>To make your day special and even more memorable</p>
+    <div class="subscribe-form">
+      <input type="email" placeholder="Your email address">
+      <button>Subscribe Now</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="footer-col-title">Company</div>
+        <a href="#">Home</a>
+        <a href="#">Studio</a>
+        <a href="#">Service</a>
+        <a href="#">Blog</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Terms &amp; Policies</div>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms &amp; Conditions</a>
+        <a href="#">Explore</a>
+        <a href="#">Accessibility</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Follow Us</div>
+        <a href="#">Instagram</a>
+        <a href="#">LinkedIn</a>
+        <a href="#">Notlist</a>
+        <a href="#">Twitter</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Terms &amp; Policies</div>
+        <p>148 Mulford ave, STE 20, Chicago, IL 5001</p>
+        <p>123-456789059</p>
+        <p>info@elementum.com</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">©2025 Elementum. All rights reserved.</span>
+      <span class="footer-logo">Elementum</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Sticky nav
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
+});
+
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => observer.observe(el));
+
+// Service row hover: update arrow
+document.querySelectorAll('.service-row').forEach(row => {
+  const arrow = row.querySelector('.arrow-circle svg path');
+  row.addEventListener('mouseenter', () => { if(arrow) arrow.setAttribute('stroke','#fff'); });
+  row.addEventListener('mouseleave', () => { if(arrow) arrow.setAttribute('stroke','#999'); });
+});
+</script>
+</body>
+</html>

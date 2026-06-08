@@ -45,3 +45,36 @@ console.log(obj3);
 console.log(Object.keys(obj4));  // properties
 console.log(Object.values(obj4));
 console.log(Object.entries(obj4));
+
+
+
+
+// object 3 :-
+
+// destructure of object :-
+
+const cource = {
+    courseName : "java script",
+    courcePrice : "999",
+    courceSeller : "imteyaz"
+}
+
+console.log(cource.courseName);
+const {courseName : course} = cource;
+// console.log(courseName);
+console.log(course);
+
+
+// json 
+// {
+//     "name" : "imteyaz alam",
+//     "cgpa" : "8.1"
+// }
+
+// json
+[
+    {},
+    {},
+    {}
+    
+]
