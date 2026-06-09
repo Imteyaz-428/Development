@@ -1,461 +1,266 @@
 import { useState, useEffect, useRef } from "react";
 
-// ── Utility: intersection observer hook ──
-function useInView(threshold = 0.15) {
+/* ── helpers ── */
+function useInView(t = 0.1) {
   const ref = useRef(null);
-  const [inView, setInView] = useState(false);
+  const [v, setV] = useState(false);
   useEffect(() => {
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setInView(true); }, { threshold });
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
+    const o = new IntersectionObserver(([e]) => { if (e.isIntersecting) setV(true); }, { threshold: t });
+    if (ref.current) o.observe(ref.current);
+    return () => o.disconnect();
   }, []);
-  return [ref, inView];
+  return [ref, v];
 }
+const an = (v, d = 0, dir = "u") => ({
+  opacity: v ? 1 : 0,
+  transform: v ? "translate(0)" : dir === "l" ? "translateX(-30px)" : dir === "r" ? "translateX(30px)" : "translateY(30px)",
+  transition: `opacity .7s ${d}s ease, transform .7s ${d}s ease`,
+});
+const YEL_SQ = (w=180) => `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${w}' height='8'%3E%3Cpath d='M0,5 Q${w*.25},0 ${w*.5},5 Q${w*.75},10 ${w},5' stroke='%23FBBF24' stroke-width='2.5' fill='none'/%3E%3C/svg%3E") repeat-x center/auto 8px`;
+const HL_GREEN = { background:"#6EE7B7", borderRadius:8, padding:"2px 10px", display:"inline" };
+const HL_PINK  = { background:"#F9A8D4", borderRadius:8, padding:"2px 6px",  display:"inline" };
+const Squig = ({w=180,style={}})=>(
+  <span style={{position:"absolute",bottom:-5,left:0,right:0,height:6,background:YEL_SQ(w),display:"block",...style}}/>
+);
 
-// ── Nav ──
-function Nav() {
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const h = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", h);
-    return () => window.removeEventListener("scroll", h);
-  }, []);
-  return (
-    <nav style={{
-      position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
-      padding: "18px 48px", display: "flex", alignItems: "center",
-      justifyContent: "space-between",
-      background: scrolled ? "rgba(255,255,255,0.92)" : "transparent",
-      backdropFilter: scrolled ? "blur(12px)" : "none",
-      borderBottom: scrolled ? "1px solid rgba(0,0,0,0.06)" : "none",
-      transition: "all 0.4s ease",
-    }}>
-      <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, fontWeight: 700, color: "#111", letterSpacing: -0.5 }}>
-        Elementum
-      </div>
-      <div style={{ display: "flex", gap: 36, alignItems: "center" }}>
-        {["Home", "Studio", "Service", "Blog"].map(l => (
-          <a key={l} href="#" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: "#333", textDecoration: "none", fontWeight: 400, transition: "color 0.2s" }}
-            onMouseEnter={e => e.target.style.color = "#E84545"}
-            onMouseLeave={e => e.target.style.color = "#333"}>{l}</a>
+/* ── NAV ── */
+function Nav(){
+  const [s,setS]=useState(false);
+  useEffect(()=>{const h=()=>setS(window.scrollY>30);window.addEventListener("scroll",h,{passive:true});return()=>window.removeEventListener("scroll",h);},[]);
+  return(
+    <nav style={{position:"fixed",top:0,left:0,right:0,zIndex:100,padding:"18px 48px",display:"flex",alignItems:"center",justifyContent:"space-between",background:s?"rgba(255,255,255,.96)":"transparent",boxShadow:s?"0 1px 0 rgba(0,0,0,.08)":"none",transition:"background .4s,box-shadow .4s"}}>
+      <span style={{fontFamily:"'Syne',sans-serif",fontSize:20,fontWeight:700}}>Elementum</span>
+      <div style={{display:"flex",gap:40,position:"absolute",left:"50%",transform:"translateX(-50%)"}}>
+        {["Studio","Services","Contact","FAQs"].map(l=>(
+          <a key={l} href="#" style={{fontFamily:"'Space Grotesk',sans-serif",fontSize:14,color:"#111",textDecoration:"none",transition:"opacity .2s"}}
+            onMouseEnter={e=>e.target.style.opacity=".4"} onMouseLeave={e=>e.target.style.opacity="1"}>{l}</a>
         ))}
       </div>
-      <button style={{
-        background: "#111", color: "#fff", border: "none",
-        padding: "10px 24px", borderRadius: 4, fontFamily: "'DM Sans', sans-serif",
-        fontSize: 13, fontWeight: 600, cursor: "pointer", letterSpacing: 0.3,
-        transition: "background 0.2s",
-      }}
-        onMouseEnter={e => e.target.style.background = "#E84545"}
-        onMouseLeave={e => e.target.style.background = "#111"}>
-        Contact Us
-      </button>
+      <div style={{display:"flex",flexDirection:"column",gap:5,cursor:"pointer"}}>
+        <span style={{width:24,height:1.5,background:"#111",display:"block",borderRadius:2}}/>
+        <span style={{width:24,height:1.5,background:"#111",display:"block",borderRadius:2}}/>
+      </div>
     </nav>
   );
 }
 
-// ── Hero Section ──
-function Hero() {
-  const [ref, inView] = useInView(0.1);
-  const photos = [
-    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&crop=face",
-    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop&crop=face",
-    "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop&crop=face",
-    "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=face",
-    "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&h=120&fit=crop&crop=face",
-    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=face",
-  ];
-  return (
-    <section ref={ref} style={{
-      minHeight: "100vh", background: "#fff", position: "relative",
-      display: "flex", flexDirection: "column", justifyContent: "center",
-      padding: "120px 48px 80px", overflow: "hidden",
-    }}>
-      {/* Decorative organic shapes */}
-      <div style={{ position: "absolute", top: 80, right: -60, width: 180, height: 220, border: "2px solid rgba(232,69,69,0.25)", borderRadius: "60% 40% 55% 45%", transform: "rotate(15deg)", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", top: 140, right: 60, width: 80, height: 100, background: "rgba(232,69,69,0.08)", borderRadius: "50%", transform: "rotate(-10deg)", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", left: 30, top: "55%", width: 3, height: 120, background: "#111", borderRadius: 2, transform: "rotate(-8deg)", pointerEvents: "none" }} />
-      {/* Small coloured rectangles */}
-      <div style={{ position: "absolute", top: 200, right: 80, width: 28, height: 36, background: "#E84545", borderRadius: 4, transform: "rotate(12deg)", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", top: 240, right: 110, width: 20, height: 28, background: "#7B61FF", borderRadius: 4, transform: "rotate(-8deg)", pointerEvents: "none" }} />
+/* ── HERO ── */
+const PHOTOS=[
+  {src:"https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=220&h=220&fit=crop&crop=face",w:108,bottom:0,left:"2%"},
+  {src:"https://images.unsplash.com/photo-1499996860823-5214fcc65f8f?w=220&h=220&fit=crop&crop=face",w:126,bottom:30,left:"14%"},
+  {src:"https://images.unsplash.com/photo-1552058544-f2b08422138a?w=220&h=220&fit=crop&crop=face",w:148,top:0,left:"27%"},
+  {src:"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=220&h=220&fit=crop&crop=face",w:118,bottom:15,left:"44%"},
+  {src:"https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=220&h=220&fit=crop&crop=face",w:138,bottom:0,left:"57%"},
+  {src:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=220&h=220&fit=crop&crop=face",w:112,top:18,left:"71%"},
+  {src:"https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?w=220&h=220&fit=crop&crop=face",w:130,bottom:10,left:"84%"},
+];
+function Hero(){
+  return(
+    <section style={{minHeight:"100vh",background:"#fff",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"100px 48px 60px",position:"relative",overflow:"hidden",textAlign:"center"}}>
+      {/* wavy lines left */}
+      <svg style={{position:"absolute",left:55,top:"35%",width:90,height:240,pointerEvents:"none",zIndex:0}} viewBox="0 0 90 240" fill="none">
+        <path d="M65,8 Q15,55 65,100 Q115,145 42,190 Q12,210 28,238" stroke="#111" strokeWidth="2" strokeLinecap="round" fill="none"/>
+        <path d="M45,8 Q-5,55 45,100 Q95,145 22,190 Q-8,210 8,238" stroke="#E84545" strokeWidth="1.8" strokeLinecap="round" fill="none" opacity=".6"/>
+      </svg>
+      {/* purple teardrop */}
+      <div style={{position:"absolute",right:72,top:195,width:58,height:85,background:"#7C3AED",borderRadius:"50% 50% 40% 40%/55% 55% 45% 45%",transform:"rotate(18deg)",pointerEvents:"none"}}/>
 
-      <div style={{ maxWidth: 1100, margin: "0 auto", width: "100%" }}>
-        {/* Headline */}
-        <h1 style={{
-          fontFamily: "'Playfair Display', serif", fontSize: "clamp(40px, 6vw, 76px)",
-          fontWeight: 700, lineHeight: 1.1, color: "#111", maxWidth: 700,
-          opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(40px)",
-          transition: "opacity 0.8s ease, transform 0.8s ease",
-          position: "relative", zIndex: 2,
-        }}>
-          The thinkers and doers were{" "}
-          <span style={{ position: "relative", display: "inline-block" }}>
-            changing the status Quo
-            <svg style={{ position: "absolute", bottom: -4, left: 0, width: "100%", height: 8, overflow: "visible" }} viewBox="0 0 400 8">
-              <path d="M0,6 Q100,0 200,6 Q300,0 400,6" fill="none" stroke="#E84545" strokeWidth="2.5" />
-            </svg>
-          </span>{" "}with
-        </h1>
-
-        {/* Subtext */}
-        <p style={{
-          fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: "#666",
-          maxWidth: 380, lineHeight: 1.7, marginTop: 24, marginBottom: 48,
-          opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(30px)",
-          transition: "opacity 0.8s 0.2s ease, transform 0.8s 0.2s ease",
-        }}>
-          We are a team of strategists, designers, communicators, researchers. Together, we believe that progress only happens when you refuse to play things safe.
-        </p>
-
-        {/* Circular photo cluster */}
-        <div style={{
-          position: "relative", height: 280, width: "100%",
-          opacity: inView ? 1 : 0, transition: "opacity 1s 0.3s ease",
-        }}>
-          {[
-            { img: photos[0], size: 90, top: 0, left: 80, delay: "0s" },
-            { img: photos[1], size: 110, top: 30, left: 220, delay: "0.1s" },
-            { img: photos[2], size: 100, top: 80, left: 360, delay: "0.15s" },
-            { img: photos[3], size: 120, top: 10, left: 500, delay: "0.2s" },
-            { img: photos[4], size: 95, top: 100, left: 640, delay: "0.25s" },
-            { img: photos[5], size: 85, top: 160, left: 420, delay: "0.3s" },
-          ].map((p, i) => (
-            <div key={i} style={{
-              position: "absolute", top: p.top, left: p.left,
-              width: p.size, height: p.size, borderRadius: "50%",
-              overflow: "hidden", border: "3px solid #fff",
-              boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
-              transition: `transform 0.3s ease ${p.delay}`,
-              cursor: "pointer",
-            }}
-              onMouseEnter={e => e.currentTarget.style.transform = "scale(1.08)"}
-              onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}>
-              <img src={p.img} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-            </div>
-          ))}
-          {/* Small decorative shapes between photos */}
-          <div style={{ position: "absolute", top: 60, left: 170, width: 16, height: 16, background: "#E84545", borderRadius: 2, transform: "rotate(15deg)" }} />
-          <div style={{ position: "absolute", top: 120, left: 310, width: 12, height: 12, background: "#111", borderRadius: "50%" }} />
-        </div>
+      <h1 style={{fontFamily:"'Syne',sans-serif",fontSize:"clamp(50px,7.5vw,96px)",fontWeight:800,lineHeight:1.03,color:"#111",maxWidth:1000,animation:"fadeUp .8s ease both",letterSpacing:-1,position:"relative",zIndex:2}}>
+        The <span style={{position:"relative",display:"inline"}}><span style={{position:"relative"}}>thinkers<Squig w={180}/></span></span> and<br/>
+        doers were <span style={{...HL_PINK}}>changing</span><br/>
+        the <span style={{...HL_GREEN}}>status</span> Quo with
+      </h1>
+      <p style={{fontFamily:"'Space Grotesk',sans-serif",fontSize:15,color:"#666",maxWidth:500,lineHeight:1.7,marginTop:22,position:"relative",zIndex:2,animation:"fadeUp .8s .12s ease both"}}>
+        We are a team of strategists, designers, communicators, researchers. Together, we believe that progress only happens when you refuse to play things safe.
+      </p>
+      <div style={{position:"relative",width:"100%",height:240,marginTop:64,animation:"fadeIn .9s .25s ease both"}}>
+        {PHOTOS.map((p,i)=>(
+          <div key={i} style={{position:"absolute",width:p.w,height:p.w,...(p.top!==undefined?{top:p.top}:{}),...(p.bottom!==undefined?{bottom:p.bottom}:{}),left:p.left,borderRadius:"50%",overflow:"hidden",border:"4px solid #fff",boxShadow:"0 8px 28px rgba(0,0,0,.14)",cursor:"pointer",transition:"transform .3s"}}
+            onMouseEnter={e=>e.currentTarget.style.transform="scale(1.09) translateY(-6px)"}
+            onMouseLeave={e=>e.currentTarget.style.transform="none"}>
+            <img src={p.src} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+          </div>
+        ))}
       </div>
+      <style>{`@keyframes fadeUp{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:translateY(0)}}@keyframes fadeIn{from{opacity:0}to{opacity:1}}`}</style>
     </section>
   );
 }
 
-// ── About Section: "Tomorrow should be better than today" ──
-function About() {
-  const [ref, inView] = useInView();
-  return (
-    <section ref={ref} style={{ background: "#fff", padding: "100px 48px" }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "center" }}>
-        <div style={{
-          opacity: inView ? 1 : 0, transform: inView ? "translateX(0)" : "translateX(-40px)",
-          transition: "opacity 0.8s ease, transform 0.8s ease",
-        }}>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(28px, 4vw, 46px)", fontWeight: 700, color: "#111", lineHeight: 1.2, marginBottom: 20 }}>
-            Tomorrow should be better than today
+/* ── ABOUT ── */
+function About(){
+  const [ref,v]=useInView();
+  return(
+    <section ref={ref} style={{padding:"100px 72px",background:"#fff",position:"relative",overflow:"hidden"}}>
+      <div style={{position:"absolute",top:-80,right:-80,width:340,height:340,background:"radial-gradient(circle,rgba(252,113,94,.14) 0%,transparent 68%)",pointerEvents:"none"}}/>
+      <div style={{position:"absolute",top:50,right:45,width:72,height:72,background:"#E84545",pointerEvents:"none"}}/>
+      <div style={{maxWidth:1100,margin:"0 auto",display:"grid",gridTemplateColumns:"1fr 1fr",gap:80,alignItems:"flex-start",position:"relative",zIndex:2}}>
+        <div style={an(v,0,"l")}>
+          <h2 style={{fontFamily:"'Syne',sans-serif",fontSize:"clamp(30px,4.2vw,50px)",fontWeight:700,color:"#111",lineHeight:1.15,marginBottom:20,letterSpacing:-.5}}>
+            <span style={{position:"relative",display:"inline-block"}}>Tomorrow<Squig w={160}/></span> should<br/>
+            be better than <span style={{...HL_GREEN}}>today</span>
           </h2>
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: "#666", lineHeight: 1.8, marginBottom: 16 }}>
-            We are a team of strategists, designers, communicators, researchers. Together, we believe that progress only happens when you refuse to play things safe.
-          </p>
-          <a href="#" style={{
-            display: "inline-flex", alignItems: "center", gap: 8,
-            fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 600,
-            color: "#111", textDecoration: "none", borderBottom: "1.5px solid #111",
-            paddingBottom: 2, transition: "color 0.2s, border-color 0.2s",
-          }}
-            onMouseEnter={e => { e.currentTarget.style.color = "#E84545"; e.currentTarget.style.borderColor = "#E84545"; }}
-            onMouseLeave={e => { e.currentTarget.style.color = "#111"; e.currentTarget.style.borderColor = "#111"; }}>
-            Read more ——
-          </a>
+          <p style={{fontSize:14,color:"#666",lineHeight:1.75,maxWidth:400}}>We are a team of strategists, designers communicators, researchers. Together, we believe that progress only happens when you refuse to play things safe.</p>
+          <a href="#" style={{display:"inline-flex",alignItems:"center",gap:12,fontSize:13,fontWeight:500,color:"#111",borderBottom:"1px solid #111",paddingBottom:2,marginTop:20,textDecoration:"none",transition:"color .2s,border-color .2s"}}
+            onMouseEnter={e=>{e.currentTarget.style.color="#E84545";e.currentTarget.style.borderColor="#E84545";}}
+            onMouseLeave={e=>{e.currentTarget.style.color="#111";e.currentTarget.style.borderColor="#111";}}>Read more ——→</a>
         </div>
-        <div style={{
-          opacity: inView ? 1 : 0, transform: inView ? "translateX(0)" : "translateX(40px)",
-          transition: "opacity 0.8s 0.2s ease, transform 0.8s 0.2s ease",
-          position: "relative",
-        }}>
-          {/* Pink blob behind image */}
-          <div style={{ position: "absolute", top: -20, right: -20, width: "70%", height: "70%", background: "rgba(232,69,69,0.08)", borderRadius: "50%", zIndex: 0 }} />
-          {/* Red triangle decoration */}
-          <div style={{ position: "absolute", bottom: 20, left: -10, width: 0, height: 0, borderLeft: "22px solid transparent", borderRight: "22px solid transparent", borderBottom: "38px solid #E84545", zIndex: 2 }} />
-          <img
-            src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&h=500&fit=crop"
-            alt="Team collaboration"
-            style={{ width: "100%", borderRadius: 16, objectFit: "cover", height: 380, position: "relative", zIndex: 1, boxShadow: "0 20px 60px rgba(0,0,0,0.12)" }}
-          />
+        <div style={{...an(v,.15,"r"),display:"flex",justifyContent:"flex-end",alignItems:"flex-start"}}>
+          <img style={{width:380,height:380,borderRadius:"50%",objectFit:"cover",boxShadow:"0 16px 48px rgba(0,0,0,.12)",display:"block"}} src="https://images.unsplash.com/photo-1556761175-4b46a572b786?w=760&h=760&fit=crop" alt="Team"/>
         </div>
       </div>
+      {/* wavy red connector */}
+      <svg style={{position:"absolute",bottom:-80,right:100,width:420,height:180,pointerEvents:"none",zIndex:10,overflow:"visible"}} viewBox="0 0 420 180" fill="none">
+        <path d="M380,0 Q340,80 240,120 Q140,160 40,140 Q0,132 10,180" stroke="#E84545" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+      </svg>
     </section>
   );
 }
 
-// ── Progress Section: "See how we can help you progress" ──
-function Progress() {
-  const [ref, inView] = useInView();
-  return (
-    <section ref={ref} style={{ background: "#fafafa", padding: "100px 48px" }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "center" }}>
-        <div style={{
-          opacity: inView ? 1 : 0, transform: inView ? "translateX(0)" : "translateX(-40px)",
-          transition: "opacity 0.8s 0.1s ease, transform 0.8s 0.1s ease",
-          position: "relative",
-        }}>
-          <div style={{ position: "absolute", top: -15, left: -15, width: "60%", height: "60%", background: "rgba(123,97,255,0.07)", borderRadius: "50%", zIndex: 0 }} />
-          <img
-            src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&h=500&fit=crop"
-            alt="Progress"
-            style={{ width: "100%", borderRadius: 16, objectFit: "cover", height: 380, position: "relative", zIndex: 1, boxShadow: "0 20px 60px rgba(0,0,0,0.1)" }}
-          />
+/* ── PROGRESS ── */
+function Progress(){
+  const [ref,v]=useInView();
+  return(
+    <section ref={ref} style={{padding:"140px 72px 100px",background:"#fff",position:"relative"}}>
+      <div style={{position:"absolute",top:90,left:90,width:0,height:0,borderLeft:"26px solid transparent",borderRight:"26px solid transparent",borderBottom:"46px solid #E84545",pointerEvents:"none"}}/>
+      <div style={{position:"absolute",bottom:60,left:170,width:0,height:0,borderLeft:"44px solid transparent",borderRight:"44px solid transparent",borderBottom:"76px solid #E84545",pointerEvents:"none"}}/>
+      <div style={{maxWidth:1100,margin:"0 auto",display:"grid",gridTemplateColumns:"1fr 1fr",gap:80,alignItems:"center",position:"relative",zIndex:2}}>
+        <div style={{...an(v,0,"l"),display:"flex",justifyContent:"flex-start"}}>
+          <img style={{width:370,height:370,borderRadius:"50%",objectFit:"cover",boxShadow:"0 16px 48px rgba(0,0,0,.12)",display:"block"}} src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=740&h=740&fit=crop" alt="Progress"/>
         </div>
-        <div style={{
-          opacity: inView ? 1 : 0, transform: inView ? "translateX(0)" : "translateX(40px)",
-          transition: "opacity 0.8s 0.2s ease, transform 0.8s 0.2s ease",
-        }}>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(28px, 4vw, 46px)", fontWeight: 700, color: "#111", lineHeight: 1.2, marginBottom: 20 }}>
-            See how we can help you progress
+        <div style={an(v,.15,"r")}>
+          <h2 style={{fontFamily:"'Syne',sans-serif",fontSize:"clamp(30px,4.2vw,50px)",fontWeight:700,color:"#111",lineHeight:1.15,marginBottom:20,letterSpacing:-.5}}>
+            <span style={{...HL_GREEN}}>See</span> how we can<br/>
+            help you <span style={{position:"relative",display:"inline-block"}}>progress<Squig w={160}/></span>
           </h2>
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: "#666", lineHeight: 1.8, marginBottom: 8 }}>
-            We add a layer of fearless insights and action that allows change makers to accelerate their progress in areas such as brand, design, digital, comms and social research.
-          </p>
-          <a href="#" style={{
-            display: "inline-flex", alignItems: "center", gap: 8,
-            fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 600,
-            color: "#111", textDecoration: "none", borderBottom: "1.5px solid #111",
-            paddingBottom: 2, marginTop: 16, transition: "color 0.2s, border-color 0.2s",
-          }}
-            onMouseEnter={e => { e.currentTarget.style.color = "#E84545"; e.currentTarget.style.borderColor = "#E84545"; }}
-            onMouseLeave={e => { e.currentTarget.style.color = "#111"; e.currentTarget.style.borderColor = "#111"; }}>
-            Read more ——
-          </a>
+          <p style={{fontSize:14,color:"#666",lineHeight:1.75,maxWidth:400}}>We add a layer of fearless insights and action that allows change makers to accelerate their progress in areas such as brand, design, digital, comms and social research.</p>
+          <a href="#" style={{display:"inline-flex",alignItems:"center",gap:12,fontSize:13,fontWeight:500,color:"#111",borderBottom:"1px solid #111",paddingBottom:2,marginTop:20,textDecoration:"none",transition:"color .2s,border-color .2s"}}
+            onMouseEnter={e=>{e.currentTarget.style.color="#E84545";e.currentTarget.style.borderColor="#E84545";}}
+            onMouseLeave={e=>{e.currentTarget.style.color="#111";e.currentTarget.style.borderColor="#111";}}>Read more ——→</a>
         </div>
       </div>
     </section>
   );
 }
 
-// ── Services Section: "What we can offer you!" ──
-const services = [
-  { category: "Office of multiple interest content", title: "Collaborative & partnership", desc: "Building meaningful partnerships that drive innovation and create lasting impact across industries." },
-  { category: "The hanger US Air force digital experimental", title: "We talk about our weight", desc: "Strategic weight — giving every project the gravitas and consideration it deserves." },
-  { category: "Delta faucet content, social, digital", title: "Piloting digital confidence", desc: "Navigating the digital landscape with confidence, clarity, and creative precision." },
+/* ── SERVICES ── */
+const SVCS=[
+  {cat:"Office of multiple\ninterest content",title:"Collaborative & partnership"},
+  {cat:"The hanger US Air force\ndigital experimental",title:"We talk about our weight"},
+  {cat:"Delta faucet content,\nsocial, digital",title:"Piloting digital confidence"},
 ];
-
-function Services() {
-  const [ref, inView] = useInView(0.1);
-  const [hovered, setHovered] = useState(null);
-  return (
-    <section ref={ref} style={{ background: "#fff", padding: "100px 48px" }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-        <h2 style={{
-          fontFamily: "'Playfair Display', serif", fontSize: "clamp(32px, 5vw, 58px)",
-          fontWeight: 700, color: "#111", lineHeight: 1.15, marginBottom: 64,
-          opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(30px)",
-          transition: "opacity 0.7s ease, transform 0.7s ease",
-        }}>
-          What we can<br />
-          <span style={{ fontStyle: "italic", color: "#E84545" }}>offer</span> you!
+function Services(){
+  const [ref,v]=useInView(.1);
+  const [hov,setHov]=useState(null);
+  return(
+    <section ref={ref} style={{padding:"100px 72px",background:"#fff"}}>
+      <div style={{maxWidth:1100,margin:"0 auto"}}>
+        <h2 style={{fontFamily:"'Syne',sans-serif",fontSize:"clamp(40px,6.5vw,80px)",fontWeight:800,color:"#111",lineHeight:1.05,marginBottom:64,letterSpacing:-1.5,...an(v)}}>
+          What we <span style={{...HL_GREEN,fontFamily:"inherit",fontWeight:"inherit",fontSize:"inherit"}}>can</span><br/>
+          <span style={{position:"relative",display:"inline-block"}}>offer<Squig w={140}/></span> you!
         </h2>
-        <div>
-          {services.map((s, i) => (
-            <div key={i}
-              onMouseEnter={() => setHovered(i)}
-              onMouseLeave={() => setHovered(null)}
-              style={{
-                display: "grid", gridTemplateColumns: "220px 1fr auto",
-                alignItems: "center", gap: 40, padding: "28px 0",
-                borderBottom: "1px solid rgba(0,0,0,0.1)",
-                cursor: "pointer",
-                opacity: inView ? 1 : 0,
-                transform: inView ? "translateX(0)" : "translateX(-20px)",
-                transition: `opacity 0.6s ${0.15 * i + 0.1}s ease, transform 0.6s ${0.15 * i + 0.1}s ease, background 0.2s`,
-                borderRadius: 8,
-                background: hovered === i ? "rgba(232,69,69,0.03)" : "transparent",
-                marginLeft: -16, paddingLeft: 16, paddingRight: 16,
-              }}>
-              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: "#999", lineHeight: 1.5 }}>{s.category}</div>
-              <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(18px, 2.5vw, 28px)", fontWeight: 600, color: hovered === i ? "#E84545" : "#111", transition: "color 0.2s" }}>{s.title}</div>
-              <div style={{
-                width: 36, height: 36, borderRadius: "50%",
-                border: `1.5px solid ${hovered === i ? "#E84545" : "#ccc"}`,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                transition: "border-color 0.2s, background 0.2s",
-                background: hovered === i ? "#E84545" : "transparent", flexShrink: 0,
-              }}>
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <path d="M2 7h10M7 2l5 5-5 5" stroke={hovered === i ? "#fff" : "#999"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-            </div>
-          ))}
-        </div>
+        {SVCS.map((s,i)=>(
+          <div key={i} onMouseEnter={()=>setHov(i)} onMouseLeave={()=>setHov(null)}
+            style={{display:"grid",gridTemplateColumns:"210px 1fr 50px",alignItems:"center",gap:24,padding:"22px 0",borderTop:"1px solid #e4e4e4",...(i===SVCS.length-1?{borderBottom:"1px solid #e4e4e4"}:{}),cursor:"pointer",...an(v,.05+i*.1)}}>
+            <div style={{fontSize:11.5,color:"#aaa",lineHeight:1.55,whiteSpace:"pre-line"}}>{s.cat}</div>
+            <div style={{fontFamily:"'Syne',sans-serif",fontSize:"clamp(18px,2.5vw,28px)",fontWeight:600,color:hov===i?"#E84545":"#111",transition:"color .2s",letterSpacing:-.3}}>{s.title}</div>
+            <span style={{fontSize:20,color:"#444",justifySelf:"end",transition:"transform .2s",transform:hov===i?"translateX(6px)":"none",display:"block"}}>→</span>
+          </div>
+        ))}
       </div>
     </section>
   );
 }
 
-// ── Testimonials ──
-const testimonials = [
-  {
-    text: "Elementum delivered the site within the timeline as they requested. In the end, the client found a 50% increase in traffic within days since its launch. They also had an impressive ability to use technologies that the company hasn't used, which have also proved to be easy to use and reliable.",
-    img: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=80&h=80&fit=crop&crop=face",
-  },
-];
-
-const sidePhotos = [
-  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face",
-  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=face",
-  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&h=80&fit=crop&crop=face",
-  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face",
-  "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face",
-];
-
-function Testimonials() {
-  const [ref, inView] = useInView(0.1);
-  return (
-    <section ref={ref} style={{ background: "#fafafa", padding: "100px 48px" }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-        <h2 style={{
-          fontFamily: "'Playfair Display', serif", fontSize: "clamp(28px, 4vw, 48px)",
-          fontWeight: 700, color: "#111", textAlign: "center", marginBottom: 16,
-          opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(20px)",
-          transition: "opacity 0.7s ease, transform 0.7s ease",
-        }}>
-          What our customer says{" "}
-          <span style={{ fontStyle: "italic", textDecoration: "underline", textDecorationColor: "#E84545" }}>About Us</span>
-        </h2>
-
-        <div style={{
-          display: "grid", gridTemplateColumns: "80px 1fr 80px",
-          gap: 32, alignItems: "center", marginTop: 60,
-          opacity: inView ? 1 : 0, transition: "opacity 0.8s 0.2s ease",
-        }}>
-          {/* Left scattered photos */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 12, alignItems: "center" }}>
-            {sidePhotos.slice(0, 3).map((p, i) => (
-              <img key={i} src={p} alt="" style={{ width: 52 + i * 8, height: 52 + i * 8, borderRadius: "50%", objectFit: "cover", border: "3px solid #fff", boxShadow: "0 4px 12px rgba(0,0,0,0.1)", marginLeft: i % 2 === 0 ? 0 : 12 }} />
-            ))}
-          </div>
-
-          {/* Central testimonial card */}
-          <div style={{
-            background: "#fff", borderRadius: 16, padding: "36px 40px",
-            boxShadow: "0 8px 40px rgba(0,0,0,0.08)", position: "relative",
-          }}>
-            <div style={{ fontSize: 72, color: "#E84545", lineHeight: 0.7, fontFamily: "serif", marginBottom: 16, opacity: 0.3 }}>"</div>
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: "#555", lineHeight: 1.8, marginBottom: 24, textAlign: "center" }}>
-              {testimonials[0].text}
-            </p>
-            <div style={{ display: "flex", justifyContent: "flex-end" }}>
-              <div style={{ fontSize: 72, color: "#E84545", lineHeight: 0.7, fontFamily: "serif", opacity: 0.3 }}>"</div>
-            </div>
-          </div>
-
-          {/* Right scattered photos */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 12, alignItems: "center" }}>
-            {sidePhotos.slice(2, 5).map((p, i) => (
-              <img key={i} src={p} alt="" style={{ width: 56 - i * 6, height: 56 - i * 6, borderRadius: "50%", objectFit: "cover", border: "3px solid #fff", boxShadow: "0 4px 12px rgba(0,0,0,0.1)", marginLeft: i % 2 === 0 ? 0 : -12 }} />
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ── Newsletter ──
-function Newsletter() {
-  const [ref, inView] = useInView();
-  const [email, setEmail] = useState("");
-  return (
-    <section ref={ref} style={{ background: "#C8F0D8", padding: "80px 48px", position: "relative", overflow: "hidden" }}>
-      {/* Decorative shape */}
-      <div style={{ position: "absolute", right: 80, top: "50%", transform: "translateY(-50%)", width: 80, height: 110, background: "#7B61FF", borderRadius: "50% 50% 50% 50% / 60% 60% 40% 40%", opacity: 0.7 }} />
-      <div style={{ position: "absolute", right: 140, bottom: 20, width: 40, height: 40, border: "2px solid rgba(0,0,0,0.15)", borderRadius: "50%" }} />
-
-      <div style={{
-        maxWidth: 600, margin: "0 auto", textAlign: "center", position: "relative", zIndex: 1,
-        opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(30px)",
-        transition: "opacity 0.8s ease, transform 0.8s ease",
-      }}>
-        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(28px, 4vw, 48px)", fontWeight: 700, color: "#111", marginBottom: 12 }}>
-          Subscribe to<br />our newsletter
-        </h2>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "#444", marginBottom: 32 }}>
-          To make your day special and even more memorable
-        </p>
-        <div style={{ display: "flex", gap: 0, maxWidth: 400, margin: "0 auto", borderRadius: 4, overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }}>
-          <input
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            placeholder="Your email address"
-            style={{
-              flex: 1, padding: "14px 18px", border: "none", outline: "none",
-              fontFamily: "'DM Sans', sans-serif", fontSize: 13, background: "#fff", color: "#333",
-            }}
-          />
-          <button style={{
-            background: "#111", color: "#fff", border: "none",
-            padding: "14px 22px", fontFamily: "'DM Sans', sans-serif",
-            fontSize: 13, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap",
-            transition: "background 0.2s",
-          }}
-            onMouseEnter={e => e.target.style.background = "#E84545"}
-            onMouseLeave={e => e.target.style.background = "#111"}>
-            Subscribe Now
-          </button>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ── Footer ──
-function Footer() {
-  const cols = [
-    { title: "Company", links: ["Home", "Studio", "Service", "Blog"] },
-    { title: "Terms & Policies", links: ["Privacy Policy", "Terms & Conditions", "Explore", "Accessibility"] },
-    { title: "Follow Us", links: ["Instagram", "LinkedIn", "Notlist", "Twitter"] },
-    { title: "Terms & Policies", info: ["148 Mulford ave, STE 20, Chicago, IL 5001", "123-456789059", "info@elementum.com"] },
+/* ── TESTIMONIALS ── */
+function Testimonials(){
+  const [ref,v]=useInView(.1);
+  const LP=[
+    {src:"https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=120&h=120&fit=crop&crop=face",s:62,ml:10,mb:14,as:"flex-end"},
+    {src:"https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=120&h=120&fit=crop&crop=face",s:82,ml:0,mb:14,as:"flex-start"},
+    {src:"https://images.unsplash.com/photo-1554151228-14d9def656e4?w=120&h=120&fit=crop&crop=face",s:58,ml:18,mb:0,as:"flex-end"},
   ];
-  return (
-    <footer style={{ background: "#fff", borderTop: "1px solid rgba(0,0,0,0.08)", padding: "60px 48px 40px" }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 48, marginBottom: 48 }}>
-          {cols.map((col, i) => (
-            <div key={i}>
-              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", color: "#999", marginBottom: 20 }}>{col.title}</div>
-              {col.links ? col.links.map(l => (
-                <a key={l} href="#" style={{ display: "block", fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "#444", textDecoration: "none", marginBottom: 10, transition: "color 0.2s" }}
-                  onMouseEnter={e => e.target.style.color = "#E84545"}
-                  onMouseLeave={e => e.target.style.color = "#444"}>{l}</a>
-              )) : col.info.map((line, j) => (
-                <p key={j} style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "#666", marginBottom: 8, lineHeight: 1.5 }}>{line}</p>
-              ))}
-            </div>
-          ))}
-        </div>
-        <div style={{ borderTop: "1px solid rgba(0,0,0,0.08)", paddingTop: 24, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12, color: "#aaa" }}>©2025 Elementum. All rights reserved.</span>
-          <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 16, fontWeight: 700, color: "#111" }}>Elementum</span>
+  const RP=[
+    {src:"https://images.unsplash.com/photo-1522529599102-193c0d76b5b6?w=120&h=120&fit=crop&crop=face",s:70,ml:10,mb:14,as:"flex-start"},
+    {src:"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop&crop=face",s:56,ml:0,mb:14,as:"flex-end"},
+    {src:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&crop=face",s:88,ml:4,mb:0,as:"flex-start"},
+  ];
+  return(
+    <section ref={ref} style={{padding:"100px 72px",background:"#fff"}}>
+      <div style={{maxWidth:1100,margin:"0 auto"}}>
+        <h2 style={{fontFamily:"'Syne',sans-serif",fontSize:"clamp(26px,3.8vw,44px)",fontWeight:700,color:"#111",textAlign:"center",letterSpacing:-.5,marginBottom:64,...an(v)}}>
+          <span style={{...HL_GREEN,fontFamily:"inherit",fontWeight:"inherit",fontSize:"inherit"}}>What</span> our customer<br/>
+          says <span style={{position:"relative",display:"inline-block"}}>About Us<Squig w={140}/></span>
+        </h2>
+        <div style={{display:"grid",gridTemplateColumns:"130px 1fr 160px",gap:32,alignItems:"center",...an(v,.12)}}>
+          <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end"}}>
+            {LP.map((p,i)=><img key={i} src={p.src} alt="" style={{width:p.s,height:p.s,borderRadius:"50%",objectFit:"cover",border:"3px solid #fff",boxShadow:"0 4px 14px rgba(0,0,0,.1)",marginBottom:p.mb,marginLeft:p.ml,alignSelf:p.as}}/>)}
+          </div>
+          <div style={{background:"#f7f7f7",borderRadius:14,padding:"32px 36px",position:"relative"}}>
+            <div style={{fontFamily:"Georgia,serif",fontSize:40,color:"#ccc",lineHeight:1,marginBottom:12}}>"</div>
+            <p style={{fontSize:13.5,color:"#444",lineHeight:1.8,textAlign:"center"}}>Elementum delivered the site within the timeline as they requested. In the end, the client found a 50% increase in traffic within days since its launch. They also had an impressive ability to use technologies that the company hasn't used, which have also proved to be easy to use and reliable.</p>
+            <div style={{position:"absolute",bottom:18,right:22,fontFamily:"Georgia,serif",fontSize:40,color:"#ccc",lineHeight:1}}>"</div>
+          </div>
+          <div style={{display:"flex",flexDirection:"column",alignItems:"flex-start"}}>
+            {RP.map((p,i)=><img key={i} src={p.src} alt="" style={{width:p.s,height:p.s,borderRadius:"50%",objectFit:"cover",border:"3px solid #fff",boxShadow:"0 4px 14px rgba(0,0,0,.1)",marginBottom:p.mb,marginLeft:p.ml,alignSelf:p.as}}/>)}
+          </div>
         </div>
       </div>
+    </section>
+  );
+}
+
+/* ── NEWSLETTER ── */
+function Newsletter(){
+  const [ref,v]=useInView();
+  return(
+    <section ref={ref} style={{background:"#C8F0D8",padding:"72px 48px 56px",textAlign:"center",position:"relative",overflow:"hidden"}}>
+      <svg style={{position:"absolute",top:0,left:"50%",transform:"translateX(-10%)",width:175,pointerEvents:"none"}} viewBox="0 0 175 72" fill="none">
+        <path d="M42,10 Q58,48 24,65" stroke="#E84545" strokeWidth="2.2" strokeLinecap="round" fill="none"/>
+        <path d="M24,65 L13,63 L19,54" stroke="#E84545" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+        <path d="M88,4 Q108,42 72,60" stroke="#E84545" strokeWidth="2.2" strokeLinecap="round" fill="none"/>
+        <path d="M72,60 L61,57 L68,48" stroke="#E84545" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+      </svg>
+      <div style={{position:"absolute",right:55,top:"50%",width:76,height:116,background:"#7C3AED",clipPath:"polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%)",transform:"translateY(-50%)",pointerEvents:"none"}}/>
+      <div style={{position:"relative",zIndex:2,paddingTop:44,...an(v)}}>
+        <h2 style={{fontFamily:"'Syne',sans-serif",fontSize:"clamp(38px,6vw,72px)",fontWeight:800,color:"#111",lineHeight:1.08,letterSpacing:-1.5,marginBottom:14}}>Subscribe to<br/>our newsletter</h2>
+        <p style={{fontSize:14,color:"#444",marginBottom:40}}>To make your stay special and even more memorable</p>
+        <button style={{background:"#111",color:"#fff",border:"none",padding:"15px 46px",borderRadius:50,fontFamily:"'Space Grotesk',sans-serif",fontSize:15,fontWeight:600,cursor:"pointer",transition:"background .2s"}}
+          onMouseEnter={e=>e.target.style.background="#E84545"}
+          onMouseLeave={e=>e.target.style.background="#111"}>Subscribe Now</button>
+      </div>
+    </section>
+  );
+}
+
+/* ── FOOTER ── */
+function Footer(){
+  const COLS=[
+    {h:"Company",links:["Home","Studio","Service","Blog"]},
+    {h:"Terms & Policies",links:["Privacy Policy","Terms & Conditions","Explore","Accessibility"]},
+    {h:"Follow Us",links:["Instagram","LinkedIn","Youtube","Twitter"]},
+    {h:"Terms & Policies",info:["1498w Fluton ste, STE 2D Chicago, IL 63867.","(123) 456789000","info@elementum.com"]},
+  ];
+  return(
+    <footer style={{background:"#C8F0D8",borderTop:"1px solid rgba(0,0,0,.1)",padding:"0 72px 48px"}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:48,maxWidth:1100,margin:"0 auto",padding:"48px 0",borderBottom:"1px solid rgba(0,0,0,.1)"}}>
+        {COLS.map((c,i)=>(
+          <div key={i}>
+            <div style={{fontFamily:"'Syne',sans-serif",fontSize:17,fontWeight:700,color:"#111",marginBottom:22}}>{c.h}</div>
+            {c.links ? c.links.map(l=>(
+              <a key={l} href="#" style={{display:"block",fontSize:14,color:"#444",marginBottom:12,textDecoration:"none",transition:"color .2s"}}
+                onMouseEnter={e=>e.target.style.color="#E84545"} onMouseLeave={e=>e.target.style.color="#444"}>{l}</a>
+            )) : c.info.map((t,j)=><p key={j} style={{fontSize:14,color:"#444",marginBottom:10,lineHeight:1.55}}>{t}</p>)}
+          </div>
+        ))}
+      </div>
+      <p style={{textAlign:"center",fontSize:13,color:"#555",paddingTop:24,maxWidth:1100,margin:"0 auto"}}>©2023 Elementum. All rights reserved</p>
     </footer>
   );
 }
 
-// ── App root ──
-export default function App() {
-  return (
-    <div style={{ minHeight: "100vh" }}>
-      <Nav />
-      <Hero />
-      <About />
-      <Progress />
-      <Services />
-      <Testimonials />
-      <Newsletter />
-      <Footer />
-    </div>
-  );
+export default function App(){
+  return <><Nav/><Hero/><About/><Progress/><Services/><Testimonials/><Newsletter/><Footer/></>;
 }
+
 
